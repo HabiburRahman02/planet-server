@@ -50,6 +50,7 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     const usersCollection = client.db('plantsDB').collection('users')
+    const plantsCollection = client.db('plantsDB').collection('plants')
 
 
     // users related apis
@@ -58,11 +59,18 @@ async function run() {
       const query = { email };
       const plantData = req.body;
       const isExist = await usersCollection.findOne(query);
-      if(isExist){
-        return res.send({message: 'already store this user in database'})
+      if (isExist) {
+        return res.send({ message: 'already store this user in database' })
       }
       const result = await usersCollection.insertOne(plantData);
       res.send(result)
+    })
+
+    // plants related apis
+    app.post('/plants', async (req, res) => {
+      const data = req.body;
+      const result = await plantsCollection.insertOne(data);
+      res.send(result);
     })
 
 
