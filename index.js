@@ -72,6 +72,10 @@ async function run() {
       const result = await plantsCollection.insertOne(data);
       res.send(result);
     })
+    app.get('/plants', async (req, res) => {
+      const result = await plantsCollection.find().toArray();
+      res.send(result);
+    })
 
 
 
