@@ -49,9 +49,24 @@ const client = new MongoClient(uri, {
 })
 async function run() {
   try {
+    const usersCollection = client.db('plantsDB').collection('users')
 
 
-    
+    // users related apis
+    app.post('/users/:email', async (req, res) => {
+      const email = req.params.email;
+      const query = { email };
+      const plantData = req.body;
+      const isExist = await usersCollection.findOne(query);
+      if(isExist){
+        return res.send({message: 'already store this user in database'})
+      }
+      const result = await usersCollection.insertOne(plantData);
+      res.send(result)
+    })
+
+
+
     // Generate jwt token
     app.post('/jwt', async (req, res) => {
       const email = req.body
