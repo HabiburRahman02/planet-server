@@ -2,7 +2,7 @@ require('dotenv').config()
 const express = require('express')
 const cors = require('cors')
 const cookieParser = require('cookie-parser')
-const { MongoClient, ServerApiVersion } = require('mongodb')
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb')
 const jwt = require('jsonwebtoken')
 const morgan = require('morgan')
 
@@ -53,32 +53,6 @@ async function run() {
     const plantsCollection = client.db('plantsDB').collection('plants')
 
 
-    // users related apis
-    app.post('/users/:email', async (req, res) => {
-      const email = req.params.email;
-      const query = { email };
-      const plantData = req.body;
-      const isExist = await usersCollection.findOne(query);
-      if (isExist) {
-        return res.send({ message: 'already store this user in database' })
-      }
-      const result = await usersCollection.insertOne(plantData);
-      res.send(result)
-    })
-
-    // plants related apis
-    app.post('/plants', async (req, res) => {
-      const data = req.body;
-      const result = await plantsCollection.insertOne(data);
-      res.send(result);
-    })
-    app.get('/plants', async (req, res) => {
-      const result = await plantsCollection.find().toArray();
-      res.send(result);
-    })
-
-
-
     // Generate jwt token
     app.post('/jwt', async (req, res) => {
       const email = req.body
@@ -108,6 +82,41 @@ async function run() {
         res.status(500).send(err)
       }
     })
+
+    
+    // users related apis
+    app.post('/users/:email', async (req, res) => {
+      const email = req.params.email;
+      const query = { email };
+      const plantData = req.body;
+      const isExist = await usersCollection.findOne(query);
+      if (isExist) {
+        return res.send({ message: 'already store this user in database' })
+      }
+      const result = await usersCollection.insertOne(plantData);
+      res.send(result)
+    })
+
+    // plants related apis
+    app.post('/plants', async (req, res) => {
+      const data = req.body;
+      const result = await plantsCollection.insertOne(data);
+      res.send(result);
+    })
+    
+    app.get('/plants', async (req, res) => {
+      const result = await plantsCollection.find().toArray();
+      res.send(result);
+    })
+
+    app.get('/plant/:id',async(req,res)=>{
+      const id = req.params.id;
+      const query = {_id: new ObjectId(id)}
+      const result = await plantsCollection.findOne(query);
+      res.send(result)
+    })
+
+
 
     // Send a ping to confirm a successful connection
     await client.db('admin').command({ ping: 1 })
